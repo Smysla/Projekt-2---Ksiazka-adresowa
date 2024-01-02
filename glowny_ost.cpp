@@ -18,6 +18,7 @@ class Wpis
     Wpis() : nrTel("brak") {nPoz++;}        //konstruktor domyślny
     Wpis(std::string tel) : nrTel(tel) {nPoz++;}
     virtual ~Wpis() {nPoz--;}
+    virtual const void print() = 0;
     std::string getNr() {return nrTel;}     //zwraca numer telfonu
     void setNr(std::string nr) {nrTel=nr;}  //ustawia numer telefonu
     protected:
@@ -39,7 +40,7 @@ class Czlowiek: public Wpis
     std::string getUrodziny() {return urodziny;}        //zwraca datę urodzin
     void setImie(std::string im) {imie = im;}           //pozwala zmienić imię
     void setUrodziny(std::string dat) {urodziny = dat;} //pozwala zmienić datę urodzin
-    const void print() {std::cout << "Imię i nazwisko: " << imie << "\tnumer telefonu: " << nrTel << "\turodziny: " << urodziny << "\n";}   //wyświetla iformacje o wpisie
+    const void print() override {std::cout << "Imię i nazwisko: " << imie << "\tnumer telefonu: " << nrTel << "\turodziny: " << urodziny << "\n";}   //wyświetla iformacje o wpisie
     static int getNCzl() {return nCzl;}                 //zwraca liczbę zapisanych osób
     private:
     std::string imie;
@@ -61,7 +62,7 @@ class Firma: public Wpis
     std::string getAdres() {return adres;}          //zwraca adres
     void setAdres(std::string adr) {adres = adr;}   //zmienia adres
     void setNazwa(std::string naz) {nazwa=naz;}     //zmienia nazwę
-    const void print() {std::cout << "Nazwa firmy: " << nazwa << "\tnumer telefonu: " << nrTel << "\tadres: " << adres << "\n";}
+    const void print() override {std::cout << "Nazwa firmy: " << nazwa << "\tnumer telefonu: " << nrTel << "\tadres: " << adres << "\n";}
     static int getNFir() {return nFir;}             //zwraca liczbę zapisanych innych wpisów
     private:
     std::string nazwa;
