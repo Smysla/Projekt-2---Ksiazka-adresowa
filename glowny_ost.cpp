@@ -5,7 +5,6 @@
 */
 #include <iostream>
 #include <locale> //do polskich znaków w terminalu
-#include <vector>
 #include <map>
 #include <variant>
 #include <algorithm>
@@ -73,7 +72,7 @@ int Firma::nFir = 0;
 
 using ksiazka_t = std::map<std::string, std::variant<Czlowiek, Firma>>;
 
-template<typename T>    //template operatora dodawania do dodawania nowych wpisów do książki
+template<typename T>    //template przeciążenia operatora dodawania do dodawania nowych wpisów do książki
 void operator+(ksiazka_t& ksiazka, T& wpis){ksiazka.emplace(wpis.getImie(), wpis);}
 
 template<>
@@ -224,6 +223,16 @@ void wyswietlK(ksiazka_t& ksiazka)
     std::string nazwa;
     std::cout << "Podaj imię i nazwisko lub nazwę firmy\n";
     std::getline(std::cin>>std::ws, nazwa);
+    while (ksiazka.find(nazwa) == ksiazka.end() && nazwa != "anuluj") //sprawdzenie czy podany wpis istnieje
+    {
+        std::cout << "Taki wpis nie istnieje! Podaj poprawną wartość, lub wpisz \"anuluj\":\n";
+        std::getline(std::cin>>std::ws, nazwa);
+    }
+    if (nazwa == "anuluj")
+    {
+        std::string anuluj{"Anulowano"};
+        throw anuluj;
+    }
     std::visit([](auto& wpi){wpi.print();}, ksiazka[nazwa]);
 }
 
@@ -382,7 +391,7 @@ void edycja(ksiazka_t& ksiazka)
 void usun(ksiazka_t& ksiazka)
 {
     std::string nazwa;
-    std::cout << "Który wpis? Podaj imię i nazwisko lub nazwę firmy. Aby ununąć wszystkie pozycje wpisz wszystko. Wpisz anuluj any anulować.\n";
+    std::cout << "Który wpis? Podaj imię i nazwisko lub nazwę firmy. Aby ununąć wszystkie pozycje wpisz \"wszystko\". Wpisz \"anuluj\" any anulować.\n";
     std::getline(std::cin>>std::ws, nazwa);
     while (ksiazka.find(nazwa) == ksiazka.end() && nazwa != "wszystko" && nazwa != "anuluj")    //czy wpis istnieje?
     {
@@ -397,7 +406,7 @@ void usun(ksiazka_t& ksiazka)
     if (nazwa == "wszystko")
     {
         ksiazka.clear();
-        std::cout << "Pozycje usunięta\n";
+        std::cout << "Pozycje usunięte\n";
     }
     else
     {
@@ -413,7 +422,7 @@ void zapis(ksiazka_t& ksiazka)
     ksiazka_t::iterator it;
     std::string nazwa_pliku;
     std::unique_ptr<ksiazka_t::iterator[]> tab = std::make_unique<ksiazka_t::iterator[]>(Firma::getNFir()); //tablica przechowująca iteratory książki odpowiadające wpisom Firma
-    std::cout << "Podaj nazwę pliku lub wpisz anuluj aby anulować\n";
+    std::cout << "Podaj nazwę pliku lub wpisz \"anuluj\" aby anulować\n";
     std::cin >> nazwa_pliku;
     if (nazwa_pliku == "anuluj")    //anulowanie operacji
     {
@@ -423,7 +432,7 @@ void zapis(ksiazka_t& ksiazka)
     std::ofstream ksiazka_plik(nazwa_pliku + ".XML");   //plik jest zapisywany w formacie XML
     ksiazka_plik << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<?mso-application progid=\"Excel.Sheet\"?>\n<Workbook xmlns=\"urn:schemas-microsoft-com:office:spreadsheet\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\" xmlns:ss=\"urn:schemas-microsoft-com:office:spreadsheet\" xmlns:html=\"https://www.w3.org/TR/html401/\">\n<Worksheet ss:Name=\"Książka adresowa\">\n<Table>\n<Column ss:Index=\"1\" ss:AutoFitWidth=\"0\" ss:Width=\"110\"/>\n";   //pierwsze linijki określające parametry arkusza
     ksiazka_plik << "<Row>\n<Cell><Data ss:Type=\"String\">Osoby</Data></Cell>\n</Row>\n<Row>\n<Cell><Data ss:Type=\"String\">Imię i nazwisko</Data></Cell>\n<Cell><Data ss:Type=\"String\">Numer telefonu</Data></Cell>\n<Cell><Data ss:Type=\"String\">Urodziny</Data></Cell>\n</Row>\n"; //pierwsze dwa wiersze arkusza informujące, że poniżej są dane osobowe oraz jakie informacje znajdują się w danej kolumnnie
-    for (it = ksiazka.begin(); it != ksiazka.end(); it++)   //iterowanie przez wszystki pozycje książki
+    for (it = ksiazka.begin(); it != ksiazka.end(); it++)   //iterowanie przez wszystkie pozycje książki
     {
         if ((*it).second.index() == 0)  //najpierw zapisywane są osoby
             ksiazka_plik << "<Row>\n<Cell><Data ss:Type=\"String\">" << std::get<Czlowiek>((*it).second).getImie() << "</Data></Cell>\n<Cell><Data ss:Type=\"String\">" << std::get<Czlowiek>((*it).second).getNr() << "</Data></Cell>\n<Cell><Data ss:Type=\"String\">" << std::get<Czlowiek>((*it).second).getUrodziny() << "</Data></Cell>\n</Row>\n";
@@ -450,7 +459,7 @@ void wczytaj(ksiazka_t& ksiazka)
     size_t pos_beg = 0, pos_end, len;
     std::string bufor, nazwa_pliku, separator1 = "\">", separator2 = "</Data>";
     std::string tmp[3];
-    std::cout << "Podaj nazwę pliku lub wpisz anuluj aby anulować\n";
+    std::cout << "Podaj nazwę pliku lub wpisz \"anuluj\" aby anulować\n";
     std::cin >> nazwa_pliku;
     if (nazwa_pliku == "anuluj")    //anulowanie operacji
     {
