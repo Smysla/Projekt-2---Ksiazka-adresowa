@@ -40,7 +40,7 @@ class Czlowiek: public Wpis
     std::string getUrodziny() {return urodziny;}        //zwraca datę urodzin
     void setImie(std::string im) {imie = im;}           //pozwala zmienić imię
     void setUrodziny(std::string dat) {urodziny = dat;} //pozwala zmienić datę urodzin
-    const void print() override {std::cout << "Imię i nazwisko: " << imie << "\tnumer telefonu: " << nrTel << "\turodziny: " << urodziny << "\n";}   //wyświetla iformacje o wpisie
+    const void print() override {std::cout << "Imię i nazwisko: " << imie << "\tnumer telefonu: " << nrTel << "\turodziny: " << urodziny << "\n";}   //wyświetla informacje o wpisie
     static int getNCzl() {return nCzl;}                 //zwraca liczbę zapisanych osób
     private:
     std::string imie;
